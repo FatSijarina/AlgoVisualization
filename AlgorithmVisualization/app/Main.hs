@@ -1,6 +1,7 @@
-module Main (main) where
+module Main where
 
-import Lib
+import Algorithms (bubbleSortSteps)
+import Visualization (animateStates)
 
 main :: IO ()
-main = someFunc
+main = animateStates (bubbleSortSteps [5, 3, 8, 4, 2])
