@@ -4,4 +4,4 @@ import Algorithms (bubbleSortSteps)
 import Visualization (animateStates)
 
 main :: IO ()
-main = animateStates (bubbleSortSteps [5, 3, 8, 4, 2])
+main = animateStates (bubbleSortSteps [12, 1, 8, 4, 1,2])
