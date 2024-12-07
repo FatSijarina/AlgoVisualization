@@ -1,6 +1,6 @@
 module Algorithms.InsertionSort (insertionSortSteps) where
 
-import Algorithms.Common (SortStep(..))
+import Common (SortStep(..))
 
 -- Insertion sort implementation returning sorting steps
 insertionSortSteps :: (Ord a) => [a] -> [SortStep a]
