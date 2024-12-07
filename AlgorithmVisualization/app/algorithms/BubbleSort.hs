@@ -2,7 +2,6 @@ module Algorithms.BubbleSort (bubbleSortSteps) where
 
 import Common (SortStep(..))
 
--- Implementimi i Bubble Sort
 bubbleSortSteps :: (Ord a) => [a] -> [SortStep a]
 bubbleSortSteps xs = go xs []
   where

@@ -2,7 +2,6 @@ module Algorithms.SelectionSort (selectionSortSteps) where
 
 import Common (SortStep(..))
 
--- Implementimi i Selection Sort
 selectionSortSteps :: (Ord a) => [a] -> [SortStep a]
 selectionSortSteps xs = go xs 0 []
   where

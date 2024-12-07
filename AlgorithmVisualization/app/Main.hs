@@ -10,10 +10,10 @@ main = do
   putStrLn "2. Selection Sort"
   putStrLn "3. Insertion Sort"
   choice <- getLine
-  let algorithm = case choice of
-        "1" -> bubbleSortSteps
-        "2" -> selectionSortSteps
-        "3" -> insertionSortSteps
-        _   -> bubbleSortSteps  
+  let (algorithm, title) = case choice of
+        "1" -> (bubbleSortSteps, "Bubble Sort Visualization")
+        "2" -> (selectionSortSteps, "Selection Sort Visualization")
+        "3" -> (insertionSortSteps, "Insertion Sort Visualization")
+        _   -> (bubbleSortSteps, "Bubble Sort Visualization")
   let steps = algorithm [12, 4, 7, 1, 8, 3, 10]
-  animateStates steps
+  animateStates title steps
