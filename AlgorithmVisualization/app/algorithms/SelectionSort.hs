@@ -6,10 +6,10 @@ selectionSortSteps :: (Ord a) => [a] -> [SortStep a]
 selectionSortSteps xs = go xs 0 []
   where
     go lst i acc
-      | i >= length lst - 1 = reverse (SortStep lst [] : acc)
+      | i >= length lst - 1 = reverse (SortStep lst [] (Nothing, Nothing) : acc)
       | otherwise =
           let (minIndex, newLst) = selectAndSwap i lst
-              step = SortStep newLst [i, minIndex]
+              step = SortStep newLst [i, minIndex] (Just i, Just minIndex)
           in go newLst (i + 1) (step : acc)
 
     selectAndSwap i lst =

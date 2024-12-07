@@ -2,9 +2,11 @@ module Visualization (drawState, animateStates) where
 
 import Graphics.Gloss
 import Algorithms (SortStep(..))
+import Data.Maybe (catMaybes)
 
-drawState :: String -> [Int] -> [Int] -> Picture
-drawState title xs activeIndices = Pictures [barsPic, titlePic]
+-- Function to draw the state of the algorithm at each step
+drawState :: String -> [Int] -> [Int] -> (Maybe Int, Maybe Int) -> Picture
+drawState title xs activeIndices (i, j) = Pictures [barsPic, titlePic, indicesPic]
   where
     -- Dimensions and scaling
     barWidth = 40.0 :: Float
@@ -18,16 +20,16 @@ drawState title xs activeIndices = Pictures [barsPic, titlePic]
     yOffset = -maxBarHeight / 2
 
     -- Color logic for bars
-    barColor i = if i `elem` activeIndices then red else light blue
+    barColor idx = if idx `elem` activeIndices then red else light blue
 
     -- Draw the bars and their labels
     barsPic = Pictures $ map drawBar (zip [0..] xs)
-    drawBar (i, val) = Pictures [barPic, labelPic]
+    drawBar (idx, val) = Pictures [barPic, labelPic]
       where
-        xPos = fromIntegral i * (barWidth + spacing) + xOffset
+        xPos = fromIntegral idx * (barWidth + spacing) + xOffset
         barHeight = fromIntegral val * scaleFactor
         barPic = translate xPos (yOffset + barHeight / 2) $
-                 color (barColor i) $ rectangleSolid barWidth barHeight
+                 color (barColor idx) $ rectangleSolid barWidth barHeight
         labelPic = translate xPos (yOffset - 15) $
                    scale 0.15 0.15 $ color black $ Text (show val)
 
@@ -38,7 +40,17 @@ drawState title xs activeIndices = Pictures [barsPic, titlePic]
     titlePic = translate (-titleWidth / 2) (maxBarHeight / 2 + 50) $
                scale 0.2 0.2 $ color black $ Text title
 
+    -- Draw the indices i and j
+    indicesPic = Pictures $ catMaybes [drawIndex i "i", drawIndex j "j"]
 
+    -- Function to draw an index label (i or j) if the index is Just
+    drawIndex (Just idx) label =
+      let xPos = fromIntegral idx * (barWidth + spacing) + xOffset
+      in Just $ translate xPos (yOffset + maxBarHeight + 20) $
+                scale 0.15 0.15 $ color green $ Text label
+    drawIndex Nothing _ = Nothing  -- Don't draw if index is Nothing
+
+-- Function to animate the states
 animateStates :: String -> [SortStep Int] -> IO ()
 animateStates title steps = simulate window white fps initialIndex render update
   where
@@ -46,7 +58,8 @@ animateStates title steps = simulate window white fps initialIndex render update
     fps = 1
     initialIndex = 0
 
-    render idx = let SortStep lst active = steps !! idx
-                 in drawState title lst active
+    render idx =
+      let SortStep lst active current = steps !! idx
+      in drawState title lst active current
 
     update _ _ idx = if idx < length steps - 1 then idx + 1 else idx
