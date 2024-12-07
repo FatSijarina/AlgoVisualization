@@ -1,4 +1,6 @@
 module Algorithms
-  ( bubbleSortSteps, SortStep(..) ) where
+  ( bubbleSortSteps, selectionSortSteps, SortStep(..) ) where
 
-import Algorithms.BubbleSort (bubbleSortSteps, SortStep(..))
+import Algorithms.BubbleSort (bubbleSortSteps)
+import Algorithms.SelectionSort (selectionSortSteps)
+import Common (SortStep(..))

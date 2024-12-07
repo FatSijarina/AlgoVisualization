@@ -1,12 +1,8 @@
-module Algorithms.BubbleSort (bubbleSortSteps, SortStep(..)) where
+module Algorithms.BubbleSort (bubbleSortSteps) where
 
--- Data type for sorting steps
-data SortStep a = SortStep
-  { listState     :: [a]
-  , activeIndices :: [Int]
-  } deriving (Show)
+import Common (SortStep(..))
 
--- Bubble sort implementation returning sorting steps
+-- Implementimi i Bubble Sort
 bubbleSortSteps :: (Ord a) => [a] -> [SortStep a]
 bubbleSortSteps xs = map (\lst -> SortStep lst []) (go xs [])
   where
