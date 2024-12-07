@@ -1,22 +1,19 @@
-module Algorithms.BubbleSort (bubbleSortSteps, SortStep(..)) where
+module Algorithms.BubbleSort (bubbleSortSteps) where
 
--- Data type for sorting steps
-data SortStep a = SortStep
-  { listState     :: [a]
-  , activeIndices :: [Int]
-  } deriving (Show)
+import Algorithms.Common (SortStep(..))
 
 -- Bubble sort implementation returning sorting steps
 bubbleSortSteps :: (Ord a) => [a] -> [SortStep a]
-bubbleSortSteps xs = map (\lst -> SortStep lst []) (go xs [])
+bubbleSortSteps xs = go xs []
   where
     go lst acc
-      | isSorted lst = reverse (lst : acc)
-      | otherwise    = go (bubble lst) (lst : acc)
-    bubble [x] = [x]
+      | isSorted lst = reverse (SortStep lst [] : acc)
+      | otherwise    = let (newList, active) = bubble lst
+                       in go newList (SortStep lst active : acc)
+    bubble [x] = ([x], [])
     bubble (x:y:rest)
-      | x > y     = y : bubble (x:rest)
-      | otherwise = x : bubble (y:rest)
+      | x > y     = let (bubbled, active) = bubble (x:rest) in (y : bubbled, 0 : 1 : map (+1) active)
+      | otherwise = let (bubbled, active) = bubble (y:rest) in (x : bubbled, 1 : map (+1) active)
     isSorted [] = True
     isSorted [x] = True
     isSorted (x:y:rest) = x <= y && isSorted (y:rest)
