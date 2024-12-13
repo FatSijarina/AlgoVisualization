@@ -8,7 +8,7 @@ mergeSortSteps xs = mergeSort xs 0 (length xs - 1)
   where
     mergeSort :: (Ord a) => [a] -> Int -> Int -> [SortStep a]
     mergeSort lst left right
-      | left >= right = [SortStep lst []] -- Single-element or empty range
+      | left >= right = [SortStep lst [] (Nothing, Nothing)] -- Single-element or empty range
       | otherwise =
           let mid = (left + right) `div` 2
               leftSteps = mergeSort lst left mid
@@ -24,24 +24,24 @@ mergeSortSteps xs = mergeSort xs 0 (length xs - 1)
       in merged
 
     mergeParts :: (Ord a) => [a] -> [a] -> Int -> [a] -> [SortStep a]
-    mergeParts [] [] _ lst = [SortStep lst []]
+    mergeParts [] [] _ lst = [SortStep lst [] (Nothing, Nothing)]
     mergeParts [] ys idx lst = go ys idx lst []
     mergeParts xs [] idx lst = go xs idx lst []
     mergeParts (x:xs) (y:ys) idx lst
       | x <= y =
           let updatedList = replaceElement lst idx x
-              step = SortStep updatedList [idx]
+              step = SortStep updatedList [idx] (Just idx, Nothing)
           in step : mergeParts xs (y:ys) (idx + 1) updatedList
       | otherwise =
           let updatedList = replaceElement lst idx y
-              step = SortStep updatedList [idx]
+              step = SortStep updatedList [idx] (Just idx, Nothing)
           in step : mergeParts (x:xs) ys (idx + 1) updatedList
 
     go :: (Ord a) => [a] -> Int -> [a] -> [SortStep a] -> [SortStep a]
     go [] _ lst steps = steps
     go (z:zs) idx lst steps =
       let updatedList = replaceElement lst idx z
-          step = SortStep updatedList [idx]
+          step = SortStep updatedList [idx] (Just idx, Nothing)
       in go zs (idx + 1) updatedList (steps ++ [step])
 
     replaceElement :: [a] -> Int -> a -> [a]

@@ -45,7 +45,7 @@ animateStates :: String -> [SortStep Int] -> IO ()
 animateStates title steps = animate window white frameRenderer
   where
     window = InWindow "Algorithm Visualization" (800, 600) (100, 100)
-    delayPerFrame = 3.0
+    delayPerFrame = 1.0
 
     frameRenderer :: Float -> Picture
     frameRenderer time =
