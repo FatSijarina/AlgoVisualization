@@ -36,7 +36,7 @@ drawAppState (AppState steps currentStep paused selectedAlg) =
       , drawButton (130,  -250) 100 50 "Quick Sort"     (if selectedAlg == Quick     then lighterBlue else grey)
       , drawButton (250,  -250) 60 50 "Play"       (if paused then lighterGreen else grey)
       , drawButton (320,  -250) 60 50 "Pause"      (if paused then grey else red)
-      , drawButton (390,  -250) 60 50 "Replay"     lighterGreen  -- Add the "Replay" button here
+      , drawButton (390,  -250) 60 50 "Replay"     lighterGreen
       ]
 
     infoPic = Translate (-350) 200 $ Scale 0.2 0.2 $ Color black $ Text $ "Step: " ++ show currentStep
@@ -58,15 +58,15 @@ drawState title xs activeIndices (i, j) = Pictures [barsPic, titlePic, indicesPi
     barsPic = Pictures $ map (drawBar xOffset yOffset barWidth spacing scaleFactor barColor) (zip [0..] xs)
 
     titleWidth = fromIntegral (length title) * 12.0
-    titlePic = translate (-titleWidth / 2) (maxBarHeight / 2 + 50) $
+    titlePic = translate (-titleWidth / 2) (maxBarHeight / 2 + 50) $ 
                scale 0.2 0.2 $ color black $ Text title
 
-    indicesPic = Pictures $ catMaybes [drawIndex i "i", drawIndex j "j"]
-    drawIndex (Just idx) label =
-      let xPos = fromIntegral idx * (barWidth + spacing) + xOffset
-      in Just $ translate xPos (yOffset + maxBarHeight + 20) $
-                scale 0.15 0.15 $ color green $ Text label
-    drawIndex Nothing _ = Nothing
+    -- Draw all indices at the bottom
+    indicesPic = Pictures [translate (xOffset + fromIntegral idx * (barWidth + spacing)) (-maxBarHeight / 2 - 40)
+                           $ scale 0.15 0.15 $ color black $ Text (show idx)
+                           | idx <- [0..length xs - 1]]
+
+
 
 drawBar :: Float -> Float -> Float -> Float -> Float -> (Int -> Color) -> (Int, Int) -> Picture
 drawBar xOffset yOffset barWidth spacing scaleFactor barColor (idx, val) =
@@ -77,9 +77,12 @@ drawBar xOffset yOffset barWidth spacing scaleFactor barColor (idx, val) =
     barPic = translate xPos (yOffset + barHeight / 2) $
              color (barColor idx) $ rectangleSolid barWidth barHeight
 
+    -- Adjust the label position to be centered inside the bar
     textWidth = fromIntegral (length (show val)) * 5.0
-    labelPic = translate (xPos - textWidth / 2) (yOffset - 30) $
-               scale 0.15 0.15 $ color black $ Text (show val)
+    labelPic = translate (xPos - textWidth / 2) (yOffset + 5) $  -- Change yOffset to a fixed value
+           scale 0.15 0.15 $ color black $ Text (show val)
+
+
 
 drawButton :: (Float, Float) -> Float -> Float -> String -> Color -> Picture
 drawButton (x, y) width height label color =

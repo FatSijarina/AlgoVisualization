@@ -7,7 +7,7 @@ import Controller (initialState, handleEvent, update)
 
 main :: IO ()
 main = do
-  let window = InWindow "Sorting Algorithm Visualization" (800, 600) (100, 100)
+  let window = InWindow "Sorting Algorithm Visualization" (1000, 700) (100, 100)
       background = white
       fps = 1
   play window background fps initialState drawAppState handleEvent update
