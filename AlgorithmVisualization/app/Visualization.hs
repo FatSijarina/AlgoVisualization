@@ -1,8 +1,35 @@
-module Visualization (drawState, animateStates) where
+module Visualization (drawAppState) where
 
 import Graphics.Gloss
-import Algorithms (SortStep(..))
+import Common (SortStep(..))
 import Data.Maybe (catMaybes)
+import Controller (AppState(..), AlgorithmChoice(..))
+
+-- Define a custom lighter blue color for button selection
+lighterBlue :: Color
+lighterBlue = makeColorI 173 216 230 255 -- RGB values for a soft light blue
+
+grey :: Color
+grey = makeColorI 169 169 169 255
+
+drawAppState :: AppState -> Picture
+drawAppState (AppState steps currentStep paused selectedAlg) =
+  Pictures [arrayPic, buttonsPic, infoPic]
+  where
+    (SortStep lst active (i, j)) = steps !! currentStep
+    arrayPic = drawState (show selectedAlg) lst active (i, j)
+
+    buttonsPic = Pictures
+      [ drawButton (-350, -250) 100 50 "Bubble"    (if selectedAlg == Bubble    then lighterBlue else grey)
+      , drawButton (-230, -250) 100 50 "Selection" (if selectedAlg == Selection then lighterBlue else grey)
+      , drawButton (-110, -250) 100 50 "Insertion" (if selectedAlg == Insertion then lighterBlue else grey)
+      , drawButton (10,   -250) 100 50 "Merge"     (if selectedAlg == Merge     then lighterBlue else grey)
+      , drawButton (130,  -250) 100 50 "Quick"     (if selectedAlg == Quick     then lighterBlue else grey)
+      , drawButton (250,  -250) 60 50 "Play"       (if paused then lighterBlue else grey)
+      , drawButton (320,  -250) 60 50 "Pause"      (if paused then grey else red)
+      ]
+
+    infoPic = Translate (-350) 200 $ Scale 0.2 0.2 $ Color black $ Text $ "Step: " ++ show currentStep
 
 drawState :: String -> [Int] -> [Int] -> (Maybe Int, Maybe Int) -> Picture
 drawState title xs activeIndices (i, j) = Pictures [barsPic, titlePic, indicesPic]
@@ -18,17 +45,7 @@ drawState title xs activeIndices (i, j) = Pictures [barsPic, titlePic, indicesPi
 
     barColor idx = if idx `elem` activeIndices then red else light blue
 
-    barsPic = Pictures $ map drawBar (zip [0..] xs)
-    drawBar (idx, val) = Pictures [barPic, labelPic]
-      where
-        xPos = fromIntegral idx * (barWidth + spacing) + xOffset
-        barHeight = fromIntegral val * scaleFactor
-        barPic = translate xPos (yOffset + barHeight / 2) $
-                color (barColor idx) $ rectangleSolid barWidth barHeight
-        -- Përllogaritje e përafërt e gjysmës së gjatësisë së tekstit
-        textWidth = fromIntegral (length (show val)) * 5.0
-        labelPic = translate (xPos - textWidth / 2) (yOffset - 30) $
-                  scale 0.15 0.15 $ color black $ Text (show val)
+    barsPic = Pictures $ map (drawBar xOffset yOffset barWidth spacing scaleFactor barColor) (zip [0..] xs)
 
     titleWidth = fromIntegral (length title) * 12.0
     titlePic = translate (-titleWidth / 2) (maxBarHeight / 2 + 50) $
@@ -41,14 +58,22 @@ drawState title xs activeIndices (i, j) = Pictures [barsPic, titlePic, indicesPi
                 scale 0.15 0.15 $ color green $ Text label
     drawIndex Nothing _ = Nothing
 
-animateStates :: String -> [SortStep Int] -> IO ()
-animateStates title steps = animate window white frameRenderer
+drawBar :: Float -> Float -> Float -> Float -> Float -> (Int -> Color) -> (Int, Int) -> Picture
+drawBar xOffset yOffset barWidth spacing scaleFactor barColor (idx, val) =
+  Pictures [barPic, labelPic]
   where
-    window = InWindow "Algorithm Visualization" (800, 600) (100, 100)
-    delayPerFrame = 1.0
+    xPos = fromIntegral idx * (barWidth + spacing) + xOffset
+    barHeight = fromIntegral val * scaleFactor
+    barPic = translate xPos (yOffset + barHeight / 2) $
+             color (barColor idx) $ rectangleSolid barWidth barHeight
 
-    frameRenderer :: Float -> Picture
-    frameRenderer time =
-      let idx = min (floor (time / delayPerFrame)) (length steps - 1)
-          SortStep lst active current = steps !! idx
-      in drawState title lst active current
+    textWidth = fromIntegral (length (show val)) * 5.0
+    labelPic = translate (xPos - textWidth / 2) (yOffset - 30) $
+               scale 0.15 0.15 $ color black $ Text (show val)
+
+drawButton :: (Float, Float) -> Float -> Float -> String -> Color -> Picture
+drawButton (x, y) width height label color =
+  Pictures
+    [ Translate x y $ Color color $ Polygon [(0, 0), (width, 0), (width, height), (0, height)]
+    , Translate (x + 10) (y + 10) $ Scale 0.1 0.1 $ Color black $ Text label
+    ]

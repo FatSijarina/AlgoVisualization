@@ -1,23 +1,13 @@
 module Main where
 
-import Algorithms (bubbleSortSteps, insertionSortSteps, selectionSortSteps, mergeSortSteps, quickSortSteps)
-import Visualization (animateStates)
+import Graphics.Gloss
+import Graphics.Gloss.Interface.Pure.Game
+import Visualization (drawAppState)
+import Controller (initialState, handleEvent, update)
 
 main :: IO ()
 main = do
-  putStrLn "Zgjidh algoritmin për vizualizim:"
-  putStrLn "1. Bubble Sort"
-  putStrLn "2. Selection Sort"
-  putStrLn "3. Insertion Sort"
-  putStrLn "4. Merge Sort"
-  putStrLn "5. Quick Sort"
-  choice <- getLine
-  let (algorithm, title) = case choice of
-        "1" -> (bubbleSortSteps, "Bubble Sort Visualization")
-        "2" -> (selectionSortSteps, "Selection Sort Visualization")
-        "3" -> (insertionSortSteps, "Insertion Sort Visualization")
-        "4" -> (mergeSortSteps, "Merge Sort Visualization")
-        "5" -> (quickSortSteps, "Quick Sort Visualization")
-        _   -> (bubbleSortSteps, "Bubble Sort Visualization")
-  let steps = algorithm [12, 4, 7, 1, 8, 3, 10]
-  animateStates title steps
+  let window = InWindow "Sorting Algorithm Visualization" (800, 600) (100, 100)
+      background = white
+      fps = 1
+  play window background fps initialState drawAppState handleEvent update
