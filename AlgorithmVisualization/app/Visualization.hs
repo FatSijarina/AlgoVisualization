@@ -9,6 +9,9 @@ import Controller (AppState(..), AlgorithmChoice(..))
 lighterBlue :: Color
 lighterBlue = makeColorI 173 216 230 255 -- RGB values for a soft light blue
 
+lighterGreen :: Color
+lighterGreen = makeColorI 144 238 144 255 -- RGB values for a soft light green
+
 grey :: Color
 grey = makeColorI 169 169 169 255
 
@@ -17,16 +20,23 @@ drawAppState (AppState steps currentStep paused selectedAlg) =
   Pictures [arrayPic, buttonsPic, infoPic]
   where
     (SortStep lst active (i, j)) = steps !! currentStep
-    arrayPic = drawState (show selectedAlg) lst active (i, j)
+    arrayPic = drawState (formatAlgName selectedAlg) lst active (i, j)
+      where
+        formatAlgName Bubble    = "Bubble Sort"
+        formatAlgName Selection = "Selection Sort"
+        formatAlgName Insertion = "Insertion Sort"
+        formatAlgName Merge     = "Merge Sort"
+        formatAlgName Quick     = "Quick Sort"
 
     buttonsPic = Pictures
-      [ drawButton (-350, -250) 100 50 "Bubble"    (if selectedAlg == Bubble    then lighterBlue else grey)
-      , drawButton (-230, -250) 100 50 "Selection" (if selectedAlg == Selection then lighterBlue else grey)
-      , drawButton (-110, -250) 100 50 "Insertion" (if selectedAlg == Insertion then lighterBlue else grey)
-      , drawButton (10,   -250) 100 50 "Merge"     (if selectedAlg == Merge     then lighterBlue else grey)
-      , drawButton (130,  -250) 100 50 "Quick"     (if selectedAlg == Quick     then lighterBlue else grey)
-      , drawButton (250,  -250) 60 50 "Play"       (if paused then lighterBlue else grey)
+      [ drawButton (-350, -250) 100 50 "Bubble Sort"    (if selectedAlg == Bubble    then lighterBlue else grey)
+      , drawButton (-230, -250) 100 50 "Selection Sort" (if selectedAlg == Selection then lighterBlue else grey)
+      , drawButton (-110, -250) 100 50 "Insertion Sort" (if selectedAlg == Insertion then lighterBlue else grey)
+      , drawButton (10,   -250) 100 50 "Merge Sort"     (if selectedAlg == Merge     then lighterBlue else grey)
+      , drawButton (130,  -250) 100 50 "Quick Sort"     (if selectedAlg == Quick     then lighterBlue else grey)
+      , drawButton (250,  -250) 60 50 "Play"       (if paused then lighterGreen else grey)
       , drawButton (320,  -250) 60 50 "Pause"      (if paused then grey else red)
+      , drawButton (390,  -250) 60 50 "Replay"     lighterGreen  -- Add the "Replay" button here
       ]
 
     infoPic = Translate (-350) 200 $ Scale 0.2 0.2 $ Color black $ Text $ "Step: " ++ show currentStep
@@ -77,3 +87,11 @@ drawButton (x, y) width height label color =
     [ Translate x y $ Color color $ Polygon [(0, 0), (width, 0), (width, height), (0, height)]
     , Translate (x + 10) (y + 10) $ Scale 0.1 0.1 $ Color black $ Text label
     ]
+
+-- Logic for resetting the currentStep when Replay is clicked
+handleReplayButton :: AppState -> AppState
+handleReplayButton state@(AppState steps currentStep paused selectedAlg) =
+  if currentStep == length steps - 1 then
+    AppState steps 0 paused selectedAlg -- Reset currentStep to 0
+  else
+    state

@@ -51,7 +51,18 @@ handleButtonClick (mx, my) state@(AppState _ _ _ alg)
   -- Play/Pause buttons:
   | inButton (mx,my) (250,-250) 60 50 = state { paused = False }
   | inButton (mx,my) (320,-250) 60 50 = state { paused = True }
+  -- Replay button:
+  | inButton (mx,my) (390,-250) 60 50 = replayAlgorithm state
   | otherwise = state
+
+-- Add the Replay button functionality:
+-- Replay the algorithm from the beginning and start automatically
+replayAlgorithm :: AppState -> AppState
+replayAlgorithm state@(AppState steps _ _ alg) =
+  let newSteps = getAlgorithmSteps alg initialArray
+  in state { steps = newSteps, currentStep = 0, paused = False }
+
+
 
 -- Check if click is inside a button
 inButton :: (Float, Float) -> (Float, Float) -> Float -> Float -> Bool
