@@ -77,9 +77,8 @@ drawBar xOffset yOffset barWidth spacing scaleFactor barColor (idx, val) =
     barPic = translate xPos (yOffset + barHeight / 2) $
              color (barColor idx) $ rectangleSolid barWidth barHeight
 
-    -- Adjust the label position to be centered inside the bar
     textWidth = fromIntegral (length (show val)) * 5.0
-    labelPic = translate (xPos - textWidth / 2) (yOffset + 5) $  -- Change yOffset to a fixed value
+    labelPic = translate (xPos - textWidth / 2) (yOffset + 5) $
            scale 0.15 0.15 $ color black $ Text (show val)
 
 
