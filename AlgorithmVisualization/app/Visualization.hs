@@ -12,6 +12,10 @@ lighterBlue = makeColorI 173 216 230 255 -- RGB values for a soft light blue
 lighterGreen :: Color
 lighterGreen = makeColorI 144 238 144 255 -- RGB values for a soft light green
 
+lightOrange :: Color
+lightOrange = makeColorI 255 200 100 255 -- RGB values for light orange
+
+
 grey :: Color
 grey = makeColorI 169 169 169 255
 
@@ -21,10 +25,9 @@ drawAppState (AppState steps currentStep paused selectedAlg userInput) =
   Pictures [arrayPic, buttonsPic, inputPic, infoPic]
   where
     -- Get the current sorting step and array
-    (SortStep lst active (i, j)) = steps !! currentStep
-    
-    -- Draw the array as bars
-    arrayPic = drawState (formatAlgName selectedAlg) lst active (i, j)
+    (SortStep lst active (i, j) sorted) = steps !! currentStep
+
+    arrayPic = drawState (formatAlgName selectedAlg) lst active (i, j) sorted
     
     -- Draw the buttons for algorithm selection and play/pause actions
     buttonsPic = Pictures
@@ -53,8 +56,8 @@ formatAlgName Merge     = "Merge Sort"
 formatAlgName Quick     = "Quick Sort"
 
 -- Draw the array of bars (sorted or not)
-drawState :: String -> [Int] -> [Int] -> (Maybe Int, Maybe Int) -> Picture
-drawState title xs activeIndices (i, j) = Pictures [barsPic, titlePic, indicesPic]
+drawState :: String -> [Int] -> [Int] -> (Maybe Int, Maybe Int) -> [Int] -> Picture
+drawState title xs activeIndices (i, j) sortedIndices = Pictures [barsPic, titlePic, indicesPic]
   where
     -- Check if the array is empty to avoid calling maximum on an empty list
     maxBarHeight = if null xs then 0 else fromIntegral (maximum xs) * scaleFactor
@@ -70,7 +73,12 @@ drawState title xs activeIndices (i, j) = Pictures [barsPic, titlePic, indicesPi
     yOffset = -maxBarHeight / 2
 
     -- Function to color bars based on whether they are active
-    barColor idx = if idx `elem` activeIndices then red else light blue
+    barColor idx
+      | idx `elem` activeIndices = red
+      | idx `elem` sortedIndices = lightOrange
+      | otherwise                = lighterBlue
+
+
 
     -- Draw all bars for the current array state
     barsPic = Pictures $ map (drawBar xOffset yOffset barWidth spacing scaleFactor barColor) (zip [0..] xs)
