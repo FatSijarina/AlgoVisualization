@@ -22,7 +22,7 @@ grey = makeColorI 169 169 169 255
 -- Draw the application state
 drawAppState :: AppState -> Picture
 drawAppState (AppState steps currentStep paused selectedAlg userInput) =
-  Pictures [arrayPic, buttonsPic, inputPic, infoPic]
+  Pictures [arrayPic, buttonsPic, inputPic]
   where
     -- Get the current sorting step and array
     (SortStep lst active (i, j) sorted) = steps !! currentStep
@@ -43,9 +43,6 @@ drawAppState (AppState steps currentStep paused selectedAlg userInput) =
 
     -- Display the user input for the array as text
     inputPic = translate (-350) (-300) $ scale 0.2 0.2 $ Color black $ Text ("Array input: " ++ userInput)
-
-    -- Display the current step of the sorting algorithm
-    infoPic = Translate (-350) 200 $ Scale 0.2 0.2 $ Color black $ Text $ "Step: " ++ show currentStep
 
 -- Format algorithm names for display
 formatAlgName :: AlgorithmChoice -> String
