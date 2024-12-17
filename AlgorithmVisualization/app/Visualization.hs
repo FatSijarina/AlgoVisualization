@@ -56,39 +56,40 @@ formatAlgName Quick     = "Quick Sort"
 drawState :: String -> [Int] -> [Int] -> (Maybe Int, Maybe Int) -> [Int] -> Picture
 drawState title xs activeIndices (i, j) sortedIndices = Pictures [barsPic, titlePic, indicesPic]
   where
-    -- Check if the array is empty to avoid calling maximum on an empty list
-    maxBarHeight = if null xs then 0 else fromIntegral (maximum xs) * scaleFactor
-
-    -- Bar visualization parameters
     barWidth = 40.0 :: Float
     spacing = 20.0 :: Float
-    scaleFactor = 20.0 :: Float
-    totalWidth = fromIntegral (length xs) * (barWidth + spacing) - spacing
 
-    -- Offsets for centering the bars
+    -- Choose a desired maximum height for the tallest bar
+    desiredMaxHeight = 300.0 :: Float
+
+    -- Compute the scale factor dynamically based on the maximum value in xs
+    scaleFactor = if null xs 
+                  then 1 
+                  else desiredMaxHeight / fromIntegral (maximum xs)
+
+    -- Compute the maximum bar height with the new scale factor
+    maxBarHeight = if null xs then 0 else fromIntegral (maximum xs) * scaleFactor
+
+    -- Calculate total width to center the bars
+    totalWidth = fromIntegral (length xs) * (barWidth + spacing) - spacing
     xOffset = -totalWidth / 2
     yOffset = -maxBarHeight / 2
 
-    -- Function to color bars based on whether they are active
     barColor idx
       | idx `elem` activeIndices = red
       | idx `elem` sortedIndices = lightOrange
       | otherwise                = lighterBlue
 
-
-
-    -- Draw all bars for the current array state
     barsPic = Pictures $ map (drawBar xOffset yOffset barWidth spacing scaleFactor barColor) (zip [0..] xs)
 
-    -- Title for the algorithm
     titleWidth = fromIntegral (length title) * 12.0
     titlePic = translate (-titleWidth / 2) (maxBarHeight / 2 + 50) $ 
                scale 0.2 0.2 $ color black $ Text title
 
-    -- Draw indices below the bars
     indicesPic = Pictures [translate (xOffset + fromIntegral idx * (barWidth + spacing)) (-maxBarHeight / 2 - 40)
                            $ scale 0.15 0.15 $ color black $ Text (show idx)
                            | idx <- [0..length xs - 1]]
+
 
 
 -- Function to draw an individual bar for the sorting visualization
