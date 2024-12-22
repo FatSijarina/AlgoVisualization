@@ -2,6 +2,7 @@ module Controller (AppState(..), AlgorithmChoice(..), initialState, handleEvent,
 
 import Graphics.Gloss.Interface.Pure.Game
 import Algorithms (bubbleSortSteps, insertionSortSteps, selectionSortSteps, mergeSortSteps, quickSortSteps, SortStep(..))
+import Text.Read (readMaybe)
 
 data AlgorithmChoice
   = Bubble
@@ -25,6 +26,12 @@ getAlgorithmSteps Selection = selectionSortSteps
 getAlgorithmSteps Insertion = insertionSortSteps
 getAlgorithmSteps Merge     = mergeSortSteps
 getAlgorithmSteps Quick     = quickSortSteps
+
+validateInput :: String -> Either String [Int]
+validateInput input =
+  case mapM readMaybe (words input) of
+    Just numbers -> Right numbers
+    Nothing      -> Left "Error: Inputi duhet te permbaje vetem numra"
 
 initialState :: [Int] -> AlgorithmChoice -> AppState
 initialState userArray initialAlg =
@@ -54,10 +61,12 @@ handleEvent (EventKey (Char c) Down _ _) state =
 
 -- Handle Enter: parse the input as an array
 handleEvent (EventKey (SpecialKey KeyEnter) Down _ _) state =
-  let userArray = map read (words (userInput state)) :: [Int]
-  in if not (null userArray)
-     then state { steps = getAlgorithmSteps (selectedAlgorithm state) userArray, currentStep = 0 }
-     else state
+  case validateInput (userInput state) of
+    Right userArray ->
+      state { steps = getAlgorithmSteps (selectedAlgorithm state) userArray, currentStep = 0}
+    Left errorMsg ->
+      state { userInput = errorMsg }
+
 
 -- Handle Space: add a space to userInput
 handleEvent (EventKey (SpecialKey KeySpace) Down _ _) state =
