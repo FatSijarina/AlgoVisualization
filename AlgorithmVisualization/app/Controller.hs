@@ -2,6 +2,7 @@ module Controller (AppState(..), AlgorithmChoice(..), initialState, handleEvent,
 
 import Graphics.Gloss.Interface.Pure.Game
 import Algorithms (bubbleSortSteps, insertionSortSteps, selectionSortSteps, mergeSortSteps, quickSortSteps, SortStep(..))
+import Data.Maybe (listToMaybe)
 
 data AlgorithmChoice
   = Bubble
@@ -85,12 +86,15 @@ handleButtonClick (mx, my) state
   | otherwise = state
 
 replayAlgorithm :: AppState -> AppState
-replayAlgorithm state@(AppState _ _ _ selectedAlg _) =
-  let currentArray = case steps state of
-                       (SortStep lst _ _ _) : _ -> lst
-                       _ -> []
-      newSteps = getAlgorithmSteps selectedAlg currentArray
-  in state { steps = newSteps, currentStep = 0, paused = False }
+replayAlgorithm state =
+  state
+    { steps = getAlgorithmSteps (selectedAlgorithm state) (currentArray state)
+    , currentStep = 0
+    , paused = False
+    }
+  where
+    currentArray = maybe [] listState . listToMaybe . steps
+
 
 inButton :: (Float, Float) -> (Float, Float) -> Float -> Float -> Bool
 inButton (mx, my) (bx, by) w h =
@@ -98,15 +102,15 @@ inButton (mx, my) (bx, by) w h =
 
 selectAlgorithm :: AlgorithmChoice -> AppState -> AppState
 selectAlgorithm newAlg state =
-  let currentArray = case steps state of
-                       (SortStep lst _ _ _) : _ -> lst
-                       _ -> []
-      newSteps = getAlgorithmSteps newAlg currentArray
-  in state { selectedAlgorithm = newAlg
-           , steps = newSteps
-           , currentStep = 0
-           , paused = True
-           }
+  state
+    { selectedAlgorithm = newAlg
+    , steps = getAlgorithmSteps newAlg (currentArray state)
+    , currentStep = 0
+    , paused = True
+    }
+  where
+    currentArray = maybe [] listState . listToMaybe . steps
+
 
 update :: Float -> AppState -> AppState
 update _ state@(AppState stps curr paused _ _)

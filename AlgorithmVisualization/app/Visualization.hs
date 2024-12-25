@@ -5,16 +5,14 @@ import Controller (AppState(..), AlgorithmChoice(..))
 import Data.Maybe (catMaybes)
 import Common (SortStep(..))
 
--- Define custom colors for the buttons
 lighterBlue :: Color
-lighterBlue = makeColorI 173 216 230 255 -- RGB values for a soft light blue
+lighterBlue = makeColorI 173 216 230 255 
 
 lighterGreen :: Color
-lighterGreen = makeColorI 144 238 144 255 -- RGB values for a soft light green
+lighterGreen = makeColorI 144 238 144 255
 
 lightOrange :: Color
-lightOrange = makeColorI 255 200 100 255 -- RGB values for light orange
-
+lightOrange = makeColorI 255 200 100 255
 
 grey :: Color
 grey = makeColorI 169 169 169 255
@@ -44,7 +42,6 @@ drawAppState (AppState steps currentStep paused selectedAlg userInput) =
     -- Display the user input for the array as text
     inputPic = translate (-350) (-300) $ scale 0.2 0.2 $ Color black $ Text ("Array input: " ++ userInput)
 
--- Format algorithm names for display
 formatAlgName :: AlgorithmChoice -> String
 formatAlgName Bubble    = "Bubble Sort"
 formatAlgName Selection = "Selection Sort"
