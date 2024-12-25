@@ -34,20 +34,16 @@ mergeSortSteps xs = mergeSort xs 0 (length xs - 1)
       where
         go currentList currentIndex xs ys steps
           | null xs && null ys =
-              -- Both sides empty, merging finished
               (steps, currentList)
 
           | null xs =
-              -- Left empty, place remaining right side elements
               let (newList, newSteps) = placeRemaining currentList currentIndex ys steps
               in (newSteps, newList)
 
           | null ys =
-              -- Right empty, place remaining left side elements
               let (newList, newSteps) = placeRemaining currentList currentIndex xs steps
               in (newSteps, newList)
 
-          -- Both xs and ys are non-empty here, so we can pattern match safely
           | (x:xs') <- xs, (y:ys') <- ys =
               let currentLeftIndex = left + (length leftPart - length (x:xs'))
                   currentRightIndex = (mid + 1) + (length rightPart - length (y:ys'))
@@ -57,7 +53,6 @@ mergeSortSteps xs = mergeSort xs 0 (length xs - 1)
                                          , sortedIndices = [] }
               in if x <= y
                  then
-                   -- Choose x
                    let updatedList = replaceElement currentList currentIndex x
                        stepPlace = SortStep { listState = updatedList
                                             , activeIndices = [currentIndex]
@@ -65,7 +60,6 @@ mergeSortSteps xs = mergeSort xs 0 (length xs - 1)
                                             , sortedIndices = [] }
                    in go updatedList (currentIndex + 1) xs' ys (steps ++ [stepCompare, stepPlace])
                  else
-                   -- Choose y
                    let updatedList = replaceElement currentList currentIndex y
                        stepPlace = SortStep { listState = updatedList
                                             , activeIndices = [currentIndex]
@@ -73,7 +67,6 @@ mergeSortSteps xs = mergeSort xs 0 (length xs - 1)
                                             , sortedIndices = [] }
                    in go updatedList (currentIndex + 1) xs ys' (steps ++ [stepCompare, stepPlace])
 
-    -- placeRemaining places leftover elements (from one half) without comparisons
     placeRemaining :: [a] -> Int -> [a] -> [SortStep a] -> ([a], [SortStep a])
     placeRemaining currentList currentIndex elems steps =
       let (finalList, finalSteps, _) =
